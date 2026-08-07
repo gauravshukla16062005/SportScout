@@ -1,17 +1,23 @@
-# Virtual Environment
+# Python Virtual Environment
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
 .venv/
-.env/
 
-# Python Virtual Environment files
+# Environment variables
+.env
+.env.local
+.env.*.local
+frontend/.env
+backend/.env
+
+# Python
 *.pyc
 __pycache__/
 
-# pose_estimation module
+# ML generated files
 ml/pose_estimation/__pycache__/
 ml/pose_estimation/test_data/
 ml/pose_estimation/test_results/
@@ -20,6 +26,14 @@ ml/pose_estimation/*.mp4
 ml/pose_estimation/*.json
 ml/pose_estimation/output_*.jpg
 ml/pose_estimation/pose_keypoints_*.json
+
+# Node
+node_modules/
+frontend/node_modules/
+
+# Build
+dist/
+frontend/dist/
 
 # IDE
 .vscode/
@@ -31,6 +45,5 @@ ml/pose_estimation/pose_keypoints_*.json
 .DS_Store
 Thumbs.db
 
-# Environment variables
-.env.local
-.env.*.local
+# Logs
+*.log
