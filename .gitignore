@@ -1,0 +1,9 @@
+# Add these lines to .gitignore
+@"
+# YOLO large files
+ml/yolo_training/*.onnx
+ml/yolo_training/models/*.pt
+ml/yolo_training/runs/
+ml/yolo_training/detect/
+ml/yolo_training/outputs/
+"@ | Add-Content -Path ".gitignore" -Encoding utf8
