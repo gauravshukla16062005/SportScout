@@ -443,5 +443,33 @@ MIT License
 
 # Contributors
 
+
+
+
+
+
+
+
+
+
+(venv) PS C:\Users\gaura\SportScout> pip show ultralytics
+Name: ultralytics
+Version: 8.4.115
+Summary: Ultralytics YOLO 🚀 for SOTA object detection, multi-object tracking, instance segmentation,pose estimation, classification, and oriented object detection.
+Home-page: https://ultralytics.com
+Author: 
+Author-email: Glenn Jocher <glenn.jocher@ultralytics.com>, Jing Qiu <jing.qiu@ultralytics.com>
+License: AGPL-3.0
+Location: C:\Users\gaura\SportScout\venv\Lib\site-packages
+Requires: filelock, matplotlib, numpy, nvidia-ml-py, opencv-python, pillow, polars, psutil, pyyaml, requests, torch, torchvision, ultralytics-thop
+Required-by: 
+(venv) PS C:\Users\gaura\SportScout> 
+
+
+
+
+
+
+
 Team SportScout
 Smart India Hackathon 2026
