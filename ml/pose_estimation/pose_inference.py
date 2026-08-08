@@ -1,0 +1,246 @@
+"""
+Pose Inference Module
+Optimized for SportScout Debugging
+"""
+
+import cv2
+import json
+import os
+import datetime
+from pathlib import Path
+
+from rtmlib import draw_skeleton
+
+
+class PoseInference:
+
+    CONFIDENCE_THRESHOLD = 0.5
+    PROGRESS_INTERVAL = 10
+    MAX_FRAMES = 50
+
+    def __init__(self, model):
+        self.model = model
+        self.frames_processed = 0
+
+    def extract_keypoints(self, frame):
+        """
+        Extract keypoints from frame.
+        """
+
+        if frame is None:
+            return None, None
+
+        try:
+            rgb_frame = cv2.cvtColor(
+                frame,
+                cv2.COLOR_BGR2RGB
+            )
+
+            keypoints, scores = self.model(rgb_frame)
+
+            self.frames_processed += 1
+
+            return keypoints, scores
+
+        except Exception as e:
+            print(f"⚠️ Error processing frame: {e}")
+            return None, None
+
+    def process_image(
+        self,
+        image_path,
+        output_path=None,
+        save_json=True
+    ):
+        """
+        Process single image.
+        """
+
+        if not os.path.exists(image_path):
+            print(f"❌ Image not found: {image_path}")
+            return None, None
+
+        image_dir = Path(image_path).parent
+
+        if output_path is None:
+            output_path = str(
+                image_dir /
+                f"output_{Path(image_path).stem}.jpg"
+            )
+
+        frame = cv2.imread(image_path)
+
+        if frame is None:
+            print("❌ Could not load image")
+            return None, None
+
+        print(f"📸 Processing: {image_path}")
+
+        keypoints, scores = self.extract_keypoints(frame)
+
+        if keypoints is None or len(keypoints) == 0:
+            print("⚠️ No person detected")
+            return None, None
+
+        annotated = draw_skeleton(
+            frame,
+            keypoints,
+            scores,
+            kpt_thr=self.CONFIDENCE_THRESHOLD
+        )
+
+        cv2.imwrite(output_path, annotated)
+
+        print(f"✅ Saved image: {output_path}")
+
+        if save_json:
+
+            timestamp = datetime.datetime.now().strftime(
+                "%Y%m%d_%H%M%S"
+            )
+
+            json_path = str(
+                image_dir /
+                f"pose_keypoints_{timestamp}.json"
+            )
+
+            data = {
+                "image": image_path,
+                "timestamp": timestamp,
+                "num_keypoints": len(keypoints[0]),
+                "keypoints": (
+                    keypoints[0].tolist()
+                    if keypoints is not None
+                    else None
+                ),
+                "scores": (
+                    scores[0].tolist()
+                    if scores is not None
+                    else None
+                )
+            }
+
+            with open(json_path, "w") as f:
+                json.dump(data, f, indent=2)
+
+            print(f"✅ Saved keypoints: {json_path}")
+
+        return keypoints, scores
+
+    def process_video(
+        self,
+        video_path,
+        output_json="pose_keypoints.json"
+    ):
+        """
+        Process video and save keypoints.
+        Debug mode processes only first MAX_FRAMES.
+        """
+
+        if not os.path.exists(video_path):
+            print(f"❌ Video not found: {video_path}")
+            return None
+
+        video_dir = Path(video_path).parent
+
+        cap = cv2.VideoCapture(video_path)
+
+        if not cap.isOpened():
+            print("❌ Could not open video")
+            return None
+
+        total_frames = int(
+            cap.get(cv2.CAP_PROP_FRAME_COUNT)
+        )
+
+        fps = cap.get(
+            cv2.CAP_PROP_FPS
+        )
+
+        print(f"🎬 Processing: {video_path}")
+        print(
+            f"📊 FPS: {fps}, "
+            f"Total frames: {total_frames}"
+        )
+
+        print(
+            f"⚡ Debug mode: "
+            f"Processing first {self.MAX_FRAMES} frames only"
+        )
+
+        all_keypoints = []
+        frame_count = 0
+
+        while True:
+
+            ret, frame = cap.read()
+
+            if not ret:
+                break
+
+            if frame_count >= self.MAX_FRAMES:
+                break
+
+            frame_count += 1
+
+            keypoints, scores = self.extract_keypoints(frame)
+
+            all_keypoints.append({
+                "frame": frame_count,
+                "timestamp": frame_count / fps,
+                "keypoints": (
+                    keypoints.tolist()
+                    if keypoints is not None
+                    else None
+                ),
+                "scores": (
+                    scores.tolist()
+                    if scores is not None
+                    else None
+                )
+            })
+
+            if (
+                frame_count %
+                self.PROGRESS_INTERVAL
+                == 0
+            ):
+
+                progress = (
+                    frame_count /
+                    self.MAX_FRAMES
+                ) * 100
+
+                print(
+                    f"⏳ {frame_count}/"
+                    f"{self.MAX_FRAMES} "
+                    f"frames ({progress:.1f}%)"
+                )
+
+        cap.release()
+
+        timestamp = datetime.datetime.now().strftime(
+            "%Y%m%d_%H%M%S"
+        )
+
+        output_json = str(
+            video_dir /
+            f"pose_keypoints_{timestamp}.json"
+        )
+
+        with open(output_json, "w") as f:
+            json.dump(
+                all_keypoints,
+                f,
+                indent=2
+            )
+
+        print(
+            f"✅ Processed {frame_count} frames"
+        )
+
+        print(
+            f"📁 Saved: {output_json}"
+        )
+
+        return all_keypoints

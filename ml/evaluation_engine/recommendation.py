@@ -63,7 +63,7 @@ def generate_recommendation(evaluation: dict) -> dict:
 
     return {
 
-        "overall_score": overall,
+        "overall_score": float(overall),
 
         "recommendation": recommendation,
 

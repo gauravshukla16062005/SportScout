@@ -7,7 +7,10 @@ Feature score calculations.
 from ml.evaluation_engine.weights import FEATURE_WEIGHTS
 
 
-def calculate_weighted_score(feature_name: str, score: float) -> float:
+def calculate_weighted_score(
+    feature_name: str,
+    score: float
+) -> float:
     """
     Calculate weighted contribution of a feature.
 
@@ -22,6 +25,17 @@ def calculate_weighted_score(feature_name: str, score: float) -> float:
         Weighted score.
     """
 
-    weight = FEATURE_WEIGHTS.get(feature_name, 0)
+    if score is None:
+        score = 0.0
 
-    return score * weight
+    weight = FEATURE_WEIGHTS.get(
+        feature_name,
+        0.0
+    )
+    print(
+    feature_name,
+    score,
+    FEATURE_WEIGHTS.get(feature_name, 0)
+    )
+
+    return float(score) * float(weight)

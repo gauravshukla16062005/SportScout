@@ -20,20 +20,26 @@ def evaluate_player(features: dict) -> dict:
     """
 
     weighted_scores = {}
-
     overall_score = 0.0
 
     for feature_name, feature_data in features.items():
 
-        # Ignore modules that don't provide a numeric score
+        if not isinstance(feature_data, dict):
+            continue
+
         if "score" not in feature_data:
             continue
 
-        score = feature_data["score"]
+        score = feature_data.get("score", 0.0)
+
+        if score is None:
+            score = 0.0
+
+        print(f"{feature_name} -> {score}")
 
         weighted = calculate_weighted_score(
             feature_name,
-            score
+            float(score)
         )
 
         weighted_scores[feature_name] = round(weighted, 2)
@@ -41,9 +47,9 @@ def evaluate_player(features: dict) -> dict:
         overall_score += weighted
 
     return {
-
-        "overall_score": round(overall_score, 2),
-
-        "feature_scores": weighted_scores
-
+        "overall_score": float(round(overall_score, 2)),
+        "feature_scores": {
+            k: float(v)
+            for k, v in weighted_scores.items()
+        }
     }

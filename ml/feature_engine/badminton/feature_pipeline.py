@@ -4,6 +4,9 @@ feature_pipeline.py
 Main feature extraction pipeline for SportScout.
 """
 
+from .shoulder_rotation import calculate_shoulder_rotation
+from .body_alignment import calculate_body_alignment
+
 from ml.feature_engine.badminton.footwork import (
     calculate_footwork,
 )
@@ -54,6 +57,14 @@ def extract_features(keypoints, tracks):
         tracks
     )
 
+    shoulder_rotation = calculate_shoulder_rotation(
+        keypoints
+    )
+
+    body_alignment = calculate_body_alignment(
+        keypoints
+    )
+
     balance = calculate_balance(
         keypoints
     )
@@ -63,7 +74,7 @@ def extract_features(keypoints, tracks):
     )
 
     court_coverage = calculate_court_coverage(
-        tracks
+        keypoints
     )
 
     wrist_motion = calculate_wrist_motion(
@@ -80,19 +91,13 @@ def extract_features(keypoints, tracks):
     )
 
     return {
-
         "footwork": footwork,
-
+        "shoulder_rotation": shoulder_rotation,
+        "body_alignment": body_alignment,
         "balance": balance,
-
         "recovery": recovery,
-
         "court_coverage": court_coverage,
-
         "wrist_motion": wrist_motion,
-
         "split_step": split_step,
-
         "stroke": stroke
-
     }

@@ -54,6 +54,20 @@ class ByteTracker:
             verbose=False,
         )
 
+        print("\nRAW YOLO RESULTS")
+
+        for i, r in enumerate(results):
+
+            if r.boxes is not None and len(r.boxes) > 0:
+
+                print("FRAME:", i)
+                print("CLASSES:", r.boxes.cls)
+                print("CONF:", r.boxes.conf)
+
+                break
+
         formatted_results = format_tracking_results(results)
+
+        print("FORMATTED TRACKS:", len(formatted_results))
 
         return formatted_results
