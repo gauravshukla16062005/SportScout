@@ -26,11 +26,37 @@ ml/pose_estimation/pose_keypoints_*.json
 .idea/
 *.swp
 *.swo
+=======
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
 
 # OS
 .DS_Store
 Thumbs.db
 
+<<<<<<< HEAD
 # Environment variables
 .env.local
 .env.*.local
+=======
+# Model Weights (optional)
+*.pt
+*.pth
+*.onnx
+
+# Logs
+*.log
+>>>>>>> main
