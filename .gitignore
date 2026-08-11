@@ -1,19 +1,9 @@
-# Python Virtual Environment
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-.venv/
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
 .env
-.env.local
-
-# YOLO large files
-ml/yolo_training/*.onnx
-ml/yolo_training/models/*.pt
-ml/yolo_training/runs/
-ml/yolo_training/detect/
-ml/yolo_training/outputs/
-ml/yolo_training/data/train/images/
-ml/yolo_training/data/val/images/
-ml/yolo_training/data/test/images/
+.env.*
+!.env.example
+.DS_Store
+.vscode/
