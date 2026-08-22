@@ -8,6 +8,7 @@ import swimming from "../assets/images/swimming.jpg";
 export const sportsData = [
   {
     id: 1,
+    slug: "football",
     title: "Football",
     image: football,
     color: "from-green-500 to-emerald-700",
@@ -24,6 +25,7 @@ export const sportsData = [
 
   {
     id: 2,
+    slug: "cricket",
     title: "Cricket",
     image: cricket,
     color: "from-blue-500 to-cyan-700",
@@ -40,6 +42,7 @@ export const sportsData = [
 
   {
     id: 3,
+    slug: "badminton",
     title: "Badminton",
     image: badminton,
     color: "from-red-500 to-rose-700",
@@ -56,6 +59,7 @@ export const sportsData = [
 
   {
     id: 4,
+    slug: "tennis",
     title: "Tennis",
     image: tennis,
     color: "from-yellow-500 to-orange-700",
@@ -72,6 +76,7 @@ export const sportsData = [
 
   {
     id: 5,
+    slug: "volleyball",
     title: "Volleyball",
     image: volleyball,
     color: "from-violet-500 to-purple-700",
@@ -88,6 +93,7 @@ export const sportsData = [
 
   {
     id: 6,
+    slug: "swimming",
     title: "Swimming",
     image: swimming,
     color: "from-sky-500 to-blue-800",

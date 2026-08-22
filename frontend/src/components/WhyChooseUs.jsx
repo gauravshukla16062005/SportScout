@@ -13,33 +13,33 @@ import {
 const features = [
   {
     icon: BrainCircuit,
-    title: "Explainable AI",
-    desc: "Transparent AI predictions with detailed reasoning behind every assessment.",
+    title: "AI-Powered Assessment",
+    desc: "A structured assessment workflow designed for AI-based sports performance analysis.",
   },
   {
     icon: Camera,
-    title: "Computer Vision",
-    desc: "Advanced body tracking using state-of-the-art pose estimation.",
+    title: "Video-Based Analysis",
+    desc: "Upload sports performance videos for analysis through the connected processing system.",
   },
   {
     icon: BarChart3,
-    title: "Detailed Analytics",
-    desc: "Performance reports with strengths, weaknesses and improvement areas.",
+    title: "Performance Reports",
+    desc: "View assessment results, performance metrics and improvement recommendations when available.",
   },
   {
     icon: Trophy,
-    title: "Multi Sport",
-    desc: "Football, Cricket, Badminton, Tennis, Volleyball and Swimming.",
+    title: "Multiple Sports",
+    desc: "The platform interface supports Football, Cricket, Badminton, Tennis, Volleyball and more.",
   },
   {
     icon: Zap,
-    title: "Real-Time Analysis",
-    desc: "Fast AI powered processing for instant athlete evaluation.",
+    title: "Structured Workflow",
+    desc: "From video upload to processing and report generation through a unified athlete assessment flow.",
   },
   {
     icon: ShieldCheck,
-    title: "98% Accuracy",
-    desc: "Reliable AI models trained for sports performance assessment.",
+    title: "Backend Ready",
+    desc: "The frontend is structured to connect with authentication, video processing and AI analysis services.",
   },
 ];
 
@@ -193,11 +193,10 @@ export default function WhyChooseUs() {
               
                             <p className="mt-8 max-w-2xl text-lg leading-8 text-gray-400">
               
-                              SportsScout combines Artificial Intelligence, Computer Vision,
-                              Pose Estimation and Explainable AI to help athletes understand
-                              their strengths, identify weaknesses and continuously improve
-                              their performance.
-              
+                            SportsScout provides a complete interface for athlete assessment,
+from uploading performance videos to viewing analysis results and
+performance reports. AI processing and data services can be
+connected through the backend integration layer.
                             </p>
               
                           </div>
