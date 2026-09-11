@@ -59,4 +59,14 @@ Thumbs.db
 
 # Logs
 *.log
->>>>>>> main
+
+
+frontend/node_modules/
+venv/
+__pycache__/
+runs/
+datasets/
+*.mp4
+*.avi
+*.pt
+*.pth
