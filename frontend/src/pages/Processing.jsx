@@ -1,0 +1,321 @@
+import { motion } from "framer-motion";
+import {
+  UploadCloud,
+  ScanLine,
+  Brain,
+  CheckCircle2,
+  AlertCircle,
+  ArrowLeft,
+  FileVideo,
+} from "lucide-react";
+import { useState } from "react";
+import {
+  Link,
+  useLocation,
+  useParams,
+} from "react-router-dom";
+
+const processingStages = [
+  {
+    id: "upload",
+    title: "Uploading Video",
+    description: "Waiting for upload status from the backend",
+    icon: UploadCloud,
+  },
+  {
+    id: "frame_extraction",
+    title: "Extracting Frames",
+    description: "Waiting for frame extraction status",
+    icon: ScanLine,
+  },
+  {
+    id: "pose_detection",
+    title: "AI Pose Detection",
+    description: "Waiting for pose detection status",
+    icon: Brain,
+  },
+  {
+    id: "report_generation",
+    title: "Generating Report",
+    description: "Waiting for report generation status",
+    icon: CheckCircle2,
+  },
+];
+
+export default function Processing() {
+  const location = useLocation();
+  const { sport } = useParams();
+
+  const [processingStatus] = useState(null);
+
+  const videoName = location.state?.videoName;
+  const videoSize = location.state?.videoSize;
+
+  const formatFileSize = (bytes) => {
+    if (!bytes) return null;
+
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+
+    const index = Math.floor(
+      Math.log(bytes) / Math.log(1024)
+    );
+
+    return `${(
+      bytes / Math.pow(1024, index)
+    ).toFixed(2)} ${sizes[index]}`;
+  };
+
+  const getStageState = (stageId) => {
+    if (!processingStatus) {
+      return "waiting";
+    }
+
+    const completedStages =
+      processingStatus.completedStages || [];
+
+    if (completedStages.includes(stageId)) {
+      return "completed";
+    }
+
+    if (processingStatus.currentStage === stageId) {
+      return "processing";
+    }
+
+    return "waiting";
+  };
+
+  const getStatusText = (stage) => {
+    const stageState = getStageState(stage.id);
+
+    if (stageState === "completed") {
+      return "Completed";
+    }
+
+    if (stageState === "processing") {
+      return "Processing...";
+    }
+
+    return stage.description;
+  };
+
+  return (
+  <section className="min-h-screen bg-[#050505] px-6 py-10 text-white">
+    <div className="mx-auto w-full max-w-4xl">
+
+      <Link
+        to={`/upload/${sport}`}
+        className="mb-10 inline-flex items-center gap-3 text-gray-400 transition hover:text-red-500"
+      >
+          <ArrowLeft size={20} />
+          Back to Upload
+        </Link>
+
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-[35px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl sm:p-12"
+        >
+          {/* Header */}
+
+          <div className="text-center">
+            <h1 className="text-4xl font-bold sm:text-5xl">
+              SportsScout AI
+            </h1>
+
+            <p className="mt-5 text-lg text-gray-400">
+              Analysis status for your
+
+              <span className="mx-2 font-semibold capitalize text-red-500">
+                {sport}
+              </span>
+
+              performance video
+            </p>
+          </div>
+
+          {/* Selected Video Information */}
+
+          <div className="mt-10 rounded-3xl border border-white/10 bg-black/20 p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-red-500/10">
+                <FileVideo
+                  size={28}
+                  className="text-red-500"
+                />
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-sm uppercase tracking-[2px] text-gray-500">
+                  Selected Video
+                </p>
+
+                {videoName ? (
+                  <>
+                    <h2 className="mt-1 truncate text-xl font-semibold text-white">
+                      {videoName}
+                    </h2>
+
+                    {videoSize && (
+                      <p className="mt-1 text-sm text-gray-400">
+                        {formatFileSize(videoSize)}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <p className="mt-2 text-gray-400">
+                    No video information was received.
+                  </p>
+                )}
+              </div>
+
+            </div>
+          </div>
+
+          {/* Current Backend Status */}
+
+          <div className="mt-8 rounded-3xl border border-red-500/20 bg-red-500/10 p-6">
+            <div className="flex items-start gap-4">
+
+              <AlertCircle
+                size={26}
+                className="mt-1 shrink-0 text-red-400"
+              />
+
+              <div>
+                <h2 className="text-xl font-semibold text-red-300">
+                  Waiting for Analysis Status
+                </h2>
+
+                <p className="mt-2 leading-7 text-gray-300">
+                  No processing progress has been generated by the frontend.
+                  This page is ready to receive the real-time analysis status
+                  from the SportsScout backend.
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Processing Stages */}
+
+          <div className="mt-12 space-y-6">
+            {processingStages.map((stage, index) => {
+              const Icon = stage.icon;
+
+              const stageState =
+                getStageState(stage.id);
+
+              const isCompleted =
+                stageState === "completed";
+
+              const isProcessing =
+                stageState === "processing";
+
+              return (
+                <motion.div
+                  key={stage.id}
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{
+                    opacity: 1,
+                    x: 0,
+                  }}
+                  transition={{
+                    delay: index * 0.1,
+                  }}
+                  className={`flex items-center justify-between rounded-3xl border p-6 transition-all duration-300 ${
+                    isCompleted || isProcessing
+                      ? "border-red-500/60 bg-red-600/10"
+                      : "border-white/10 bg-white/[0.03]"
+                  }`}
+                >
+                  <div className="flex items-center gap-5">
+
+                    <div
+                      className={`rounded-2xl p-4 ${
+                        isCompleted || isProcessing
+                          ? "bg-red-600"
+                          : "bg-zinc-800"
+                      }`}
+                    >
+                      <Icon
+                        size={28}
+                        className="text-white"
+                      />
+                    </div>
+
+                    <div>
+                      <h2 className="text-xl font-semibold sm:text-2xl">
+                        {stage.title}
+                      </h2>
+
+                      <p className="mt-2 text-sm text-gray-400 sm:text-base">
+                        {getStatusText(stage)}
+                      </p>
+                    </div>
+
+                  </div>
+
+                  {isCompleted && (
+                    <CheckCircle2
+                      size={30}
+                      className="shrink-0 text-green-400"
+                    />
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+                    {/* Progress Section */}
+
+                    <div className="mt-12">
+            <div className="mb-4 flex items-center justify-between">
+
+              <span className="text-gray-400">
+                Analysis Progress
+              </span>
+
+              <span className="font-semibold text-red-400">
+                {processingStatus?.progress !== undefined
+                  ? `${processingStatus.progress}%`
+                  : "Waiting for backend"}
+              </span>
+
+            </div>
+
+            <div className="h-4 w-full overflow-hidden rounded-full bg-zinc-800">
+              <motion.div
+                animate={{
+                  width:
+                    processingStatus?.progress !== undefined
+                      ? `${processingStatus.progress}%`
+                      : "0%",
+                }}
+                transition={{
+                  duration: 0.4,
+                }}
+                className="h-full rounded-full bg-red-600"
+              />
+            </div>
+          </div>
+
+          {/* Backend Integration Info */}
+
+          <div className="mt-12 rounded-3xl border border-white/10 bg-white/[0.03] p-8">
+            <h2 className="text-2xl font-semibold">
+              Analysis Pipeline Status
+            </h2>
+
+            <p className="mt-4 leading-8 text-gray-400">
+              The processing stages and progress shown on this page will be
+              updated using real data received from the SportsScout backend.
+              The frontend does not generate artificial progress or analysis
+              results.
+            </p>
+          </div>
+
+        </motion.div>
+      </div>
+    </section>
+  );
+}
