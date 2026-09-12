@@ -47,7 +47,10 @@ def calculate_split_step(keypoints):
         else 0
     )
 
-    score = min(100.0, avg_distance / 2)
+    score = min(
+    100.0,
+    avg_distance / 4
+)
 
     return {
         "score": round(score, 2),

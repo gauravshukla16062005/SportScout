@@ -5,53 +5,76 @@ Generate recommendations from evaluation results.
 """
 
 
-def generate_recommendation(evaluation: dict) -> dict:
+def generate_recommendation(
+    evaluation: dict,
+    features: dict
+) -> dict:
     """
-    Generate player recommendations based on
-    evaluation scores.
+    Generate player recommendations.
 
     Args:
         evaluation:
             Output from evaluator.py
 
+        features:
+            Raw feature extraction results
+
     Returns:
-        Dictionary containing recommendation,
-        strengths and improvement areas.
+        Recommendation summary.
     """
 
     overall = evaluation["overall_score"]
 
     strengths = []
-
     improvements = []
 
-    for feature, score in evaluation["feature_scores"].items():
+    for feature_name, feature_data in features.items():
 
-        if score >= 20:
-            strengths.append(feature.replace("_", " ").title())
+        if not isinstance(feature_data, dict):
+            continue
 
-        elif score <= 8:
-            improvements.append(feature.replace("_", " ").title())
+        if "score" not in feature_data:
+            continue
+
+        score = float(
+            feature_data.get("score", 0)
+        )
+
+        if score >= 80:
+            strengths.append(
+                feature_name.replace(
+                    "_",
+                    " "
+                ).title()
+            )
+
+        elif score <= 60:
+            improvements.append(
+                feature_name.replace(
+                    "_",
+                    " "
+                ).title()
+            )
 
     if overall >= 85:
 
         recommendation = (
-            "Excellent performance. "
-            "Strong candidate for advanced competition."
+            "Excellent performance. Strong candidate "
+            "for advanced competition."
         )
 
     elif overall >= 70:
 
         recommendation = (
-            "Good overall performance with "
-            "some areas for improvement."
+            "Good overall performance with some "
+            "areas for improvement."
         )
 
     elif overall >= 50:
 
         recommendation = (
-            "Average performance. "
-            "Regular training is recommended."
+            "Average performance. Regular training "
+            "is recommended."
         )
 
     else:
@@ -63,7 +86,10 @@ def generate_recommendation(evaluation: dict) -> dict:
 
     return {
 
-        "overall_score": float(overall),
+        "overall_score": round(
+            overall,
+            2
+        ),
 
         "recommendation": recommendation,
 

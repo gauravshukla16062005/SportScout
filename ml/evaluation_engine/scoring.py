@@ -32,10 +32,5 @@ def calculate_weighted_score(
         feature_name,
         0.0
     )
-    print(
-    feature_name,
-    score,
-    FEATURE_WEIGHTS.get(feature_name, 0)
-    )
 
     return float(score) * float(weight)

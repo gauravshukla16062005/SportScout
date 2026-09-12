@@ -56,7 +56,10 @@ def calculate_footwork(keypoints, tracks):
 
         valid_frames += 1
 
-    score = min(100.0, total_movement / 20)
+    score = min(
+    100.0,
+    total_movement / 250
+)
 
     return {
         "score": round(score, 2),

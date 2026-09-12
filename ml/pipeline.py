@@ -20,24 +20,37 @@ from ml.evaluation_engine.recommendation import (
     generate_recommendation,
 )
 
-# Load models once when pipeline starts
+from ml.visualization.player_heatmap import (
+    generate_player_heatmap
+)
+
+from ml.visualization.movement_trail import (
+    generate_movement_trail
+)
+
+from ml.feature_engine.badminton.player_profile import (
+    generate_player_profile
+)
+
+import json
+import os
+
+
+# ---------------------------------
+# Load models once
+# ---------------------------------
+
 POSE_MODEL = RTMPoseModel(mode="balanced").load()
 POSE_INFERENCE = PoseInference(POSE_MODEL)
 
-TRACKER = ByteTracker("models/best.pt")
+TRACKER = ByteTracker(
+    "models/yolo11n.pt"
+)
 
 
 def run_pipeline(video_path: str):
     """
     Execute complete SportScout pipeline.
-
-    Args:
-        video_path (str):
-            Path to badminton video.
-
-    Returns:
-        dict:
-            Complete analysis result.
     """
 
     # -----------------------------
@@ -55,11 +68,9 @@ def run_pipeline(video_path: str):
     # -----------------------------
     tracks = TRACKER.track_video(video_path)
 
-    print("\nTRACKS FOUND:", len(tracks))
+    generate_player_heatmap(tracks)
 
-    if len(tracks) > 0:
-        print("SAMPLE TRACK:")
-        print(tracks[0])
+    generate_movement_trail(tracks)
 
     # -----------------------------
     # Step 4 : Feature Extraction
@@ -80,12 +91,85 @@ def run_pipeline(video_path: str):
     # Step 6 : Recommendation
     # -----------------------------
     recommendation = generate_recommendation(
-        evaluation
+        evaluation,
+        features
     )
 
-    return {
+    player_profile = generate_player_profile(
+    features
+)
+
+    # -----------------------------
+    # Step 7 : Build Report
+    # -----------------------------
+    report = {
         "metadata": preprocessing["metadata"],
+        "overall_score": evaluation.get(
+            "overall_score",
+            0
+        ),
         "features": features,
         "evaluation": evaluation,
         "recommendation": recommendation,
+        "player_profile": player_profile,
     }
+
+    # -----------------------------
+    # Step 8 : Console Summary
+    # -----------------------------
+    print("\n" + "=" * 50)
+    print("SPORTSCOUT ANALYSIS SUMMARY")
+    print("=" * 50)
+
+    print(
+        f"Overall Score: "
+        f"{report['overall_score']}/100"
+    )
+
+    print("\nFeature Scores:")
+
+    for name, data in features.items():
+
+        if (
+            isinstance(data, dict)
+            and "score" in data
+        ):
+            print(
+                f"  {name:<20} "
+                f"{round(float(data['score']), 2)}"
+            )
+
+    print("\nStroke Prediction:")
+
+    if "stroke" in features:
+        print(
+            f"  {features['stroke']['stroke']} "
+            f"({features['stroke']['confidence']:.2f})"
+        )
+
+    # -----------------------------
+    # Step 9 : Save JSON
+    # -----------------------------
+    os.makedirs(
+        "results",
+        exist_ok=True
+    )
+
+    with open(
+        "results/player_report.json",
+        "w",
+        encoding="utf-8"
+    ) as f:
+        json.dump(
+            report,
+            f,
+            indent=4,
+            default=str
+        )
+
+    print(
+        "\nSaved Report -> "
+        "results/player_report.json"
+    )
+
+    return report

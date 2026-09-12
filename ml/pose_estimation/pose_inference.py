@@ -11,7 +11,8 @@ class PoseInference:
 
     CONFIDENCE_THRESHOLD = 0.5
     PROGRESS_INTERVAL = 10
-    MAX_FRAMES = 50
+    MAX_FRAMES = 80
+    FRAME_SKIP = 6
 
     def __init__(self, model):
         self.model = model
@@ -159,12 +160,15 @@ class PoseInference:
         )
 
         print(
-            f"⚡ Debug mode: "
-            f"Processing first {self.MAX_FRAMES} frames only"
-        )
+    f"⚡ Sampling every "
+    f"{self.FRAME_SKIP}th frame "
+    f"(max {self.MAX_FRAMES} samples)"
+)
 
         all_keypoints = []
-        frame_count = 0
+
+        sampled_frames = 0
+        actual_frame = 0
 
         while True:
 
@@ -173,18 +177,24 @@ class PoseInference:
             if not ret:
                 break
 
-            if frame_count >= self.MAX_FRAMES:
+            actual_frame += 1
+
+            # Process every 6th frame
+            if actual_frame % self.FRAME_SKIP != 0:
+                continue
+
+            if sampled_frames >= self.MAX_FRAMES:
                 break
 
-            frame_count += 1
+            sampled_frames += 1
 
             keypoints, scores = self.extract_keypoints(
                 frame
             )
 
             all_keypoints.append({
-                "frame": frame_count,
-                "timestamp": frame_count / fps,
+                "frame": actual_frame,
+                "timestamp": actual_frame / fps,
                 "keypoints": (
                     keypoints.tolist()
                     if keypoints is not None
@@ -198,20 +208,20 @@ class PoseInference:
             })
 
             if (
-                frame_count %
+                sampled_frames %
                 self.PROGRESS_INTERVAL
                 == 0
             ):
 
                 progress = (
-                    frame_count /
+                    sampled_frames /
                     self.MAX_FRAMES
                 ) * 100
 
                 print(
-                    f"⏳ {frame_count}/"
+                    f"⏳ {sampled_frames}/"
                     f"{self.MAX_FRAMES} "
-                    f"frames ({progress:.1f}%)"
+                    f"samples ({progress:.1f}%)"
                 )
 
         cap.release()
@@ -233,7 +243,8 @@ class PoseInference:
             )
 
         print(
-            f"✅ Processed {frame_count} frames"
+            f"✅ Processed {sampled_frames} sampled frames "
+            f"from {actual_frame} total frames"
         )
 
         print(

@@ -59,7 +59,10 @@ def calculate_balance(keypoints):
 
     avg_shift = total_shift / max(valid_frames, 1)
 
-    score = max(0.0, min(100.0, 100 - avg_shift))
+    score = max(
+    0.0,
+    min(100.0, 100 - (avg_shift / 2))
+)
 
     return {
         "score": round(score, 2),

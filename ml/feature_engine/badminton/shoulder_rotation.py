@@ -34,29 +34,36 @@ def calculate_shoulder_rotation(keypoints):
         dx = right_shoulder[0] - left_shoulder[0]
         dy = right_shoulder[1] - left_shoulder[1]
 
-        angle = abs(
-            math.degrees(
-                math.atan2(dy, dx)
-            )
+        angle = math.degrees(
+            math.atan2(dy, dx)
         )
 
         angles.append(angle)
 
-    if not angles:
+    if len(angles) < 2:
         return {
             "score": 0.0,
             "metrics": {},
-            "remarks": "No shoulder data"
+            "remarks": "Insufficient shoulder data"
         }
 
-    variation = max(angles) - min(angles)
+    variation = min(
+    max(angles) - min(angles),
+    90
+)
 
-    score = min(100.0, (variation / 180.0) * 100)
-
+    score = min(
+    100.0,
+    (variation / 90) * 100
+)
     return {
         "score": round(score, 2),
         "metrics": {
-            "rotation_variation": round(variation, 2)
+            "rotation_variation": round(
+                variation,
+                2
+            )
         },
-        "remarks": "Estimated shoulder rotation"
+        "remarks":
+            "Shoulder mobility estimate"
     }

@@ -1,70 +1,52 @@
 """
-Court coverage analysis from pose trajectory.
+Court coverage analysis using ByteTrack.
 """
 
-def calculate_court_coverage(keypoints):
+import math
 
-    if not keypoints:
+
+def calculate_court_coverage(tracks):
+
+    if not tracks:
         return {
             "score": 0.0,
             "metrics": {},
-            "remarks": "No keypoints detected"
+            "remarks": "No tracking data"
         }
 
-    x_positions = []
-    y_positions = []
+    centers_x = []
+    centers_y = []
 
-    for frame in keypoints:
+    for t in tracks:
 
-        persons = frame.get("keypoints")
+        x1, y1, x2, y2 = t["bbox"]
 
-        if not persons:
-            continue
+        center_x = (x1 + x2) / 2
+        center_y = (y1 + y2) / 2
 
-        person = persons[0]
+        centers_x.append(center_x)
+        centers_y.append(center_y)
 
-        if len(person) < 13:
-            continue
-
-        left_hip = person[11]
-        right_hip = person[12]
-
-        center_x = (
-            left_hip[0] +
-            right_hip[0]
-        ) / 2
-
-        center_y = (
-            left_hip[1] +
-            right_hip[1]
-        ) / 2
-
-        x_positions.append(center_x)
-        y_positions.append(center_y)
-
-    if len(x_positions) < 2:
-        return {
-            "score": 0.0,
-            "metrics": {},
-            "remarks": "Insufficient movement data"
-        }
-
-    width = max(x_positions) - min(x_positions)
-    height = max(y_positions) - min(y_positions)
+    width = max(centers_x) - min(centers_x)
+    height = max(centers_y) - min(centers_y)
 
     movement_area = width * height
 
     score = min(
         100.0,
-        movement_area / 1000
+        movement_area / 5000
     )
 
     return {
         "score": round(score, 2),
         "metrics": {
-            "movement_area": round(movement_area, 2),
+            "movement_area": round(
+                movement_area,
+                2
+            ),
             "width": round(width, 2),
             "height": round(height, 2)
         },
-        "remarks": "Estimated from player pose trajectory"
+        "remarks":
+            "Calculated using ByteTrack trajectory"
     }

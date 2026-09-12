@@ -70,3 +70,8 @@ datasets/
 *.avi
 *.pt
 *.pth
+
+
+
+results/
+sample_frame.jpg

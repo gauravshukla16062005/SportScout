@@ -6,7 +6,9 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from ml.tracking import ByteTracker
 
-tracker = ByteTracker("models/best.pt")
+tracker = ByteTracker(
+    "yolo11n.pt"
+)
 
 tracks = tracker.track_video(
     "datasets/badminton/test.mp4"

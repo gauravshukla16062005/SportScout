@@ -53,7 +53,10 @@ def calculate_wrist_motion(keypoints):
 
         valid_frames += 1
 
-    score = min(100.0, total_motion / 25)
+    score = min(
+    100.0,
+    total_motion / 300
+)
 
     return {
         "score": round(score, 2),
