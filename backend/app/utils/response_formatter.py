@@ -9,7 +9,8 @@ def format_analysis_response(
     metadata,
     features,
     evaluation,
-    recommendation
+    recommendation,
+    player_profile=None
 ):
     """
     Create standard API response.
@@ -19,7 +20,8 @@ def format_analysis_response(
         "metadata": metadata,
         "features": features,
         "evaluation": evaluation,
-        "recommendation": recommendation
+        "recommendation": recommendation,
+        "player_profile": player_profile
     }
 
 

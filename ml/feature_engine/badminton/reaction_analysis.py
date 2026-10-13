@@ -6,24 +6,17 @@ from ByteTrack trajectory.
 """
 
 import math
+import numpy as np
 
 
 def calculate_reaction_score(tracks):
-    """
-    Estimate reaction score from
-    movement direction changes.
-    """
 
-    if not tracks or len(tracks) < 3:
+    if not tracks or len(tracks) < 5:
 
         return {
             "score": 0.0,
-            "metrics": {
-                "direction_changes": 0
-            },
-            "remarks": (
-                "Insufficient tracking data"
-            )
+            "metrics": {},
+            "remarks": "Insufficient tracking data"
         }
 
     points = []
@@ -40,11 +33,25 @@ def calculate_reaction_score(tracks):
         )
 
     direction_changes = 0
+    burst_movements = 0
 
-    for i in range(
-        2,
-        len(points)
-    ):
+    speeds = []
+
+    for i in range(1, len(points)):
+
+        x0, y0 = points[i - 1]
+        x1, y1 = points[i]
+
+        speed = math.sqrt(
+            (x1 - x0) ** 2 +
+            (y1 - y0) ** 2
+        )
+
+        speeds.append(speed)
+
+    avg_speed = np.mean(speeds)
+
+    for i in range(2, len(points)):
 
         x0, y0 = points[i - 2]
         x1, y1 = points[i - 1]
@@ -57,27 +64,17 @@ def calculate_reaction_score(tracks):
         dy2 = y2 - y1
 
         dot = (
-            dx1 * dx2
-            +
+            dx1 * dx2 +
             dy1 * dy2
         )
 
-        mag1 = math.sqrt(
-            dx1 * dx1 +
-            dy1 * dy1
-        )
-
-        mag2 = math.sqrt(
-            dx2 * dx2 +
-            dy2 * dy2
-        )
+        mag1 = math.sqrt(dx1**2 + dy1**2)
+        mag2 = math.sqrt(dx2**2 + dy2**2)
 
         if mag1 == 0 or mag2 == 0:
             continue
 
-        cosine = dot / (
-            mag1 * mag2
-        )
+        cosine = dot / (mag1 * mag2)
 
         cosine = max(
             -1,
@@ -88,20 +85,31 @@ def calculate_reaction_score(tracks):
             math.acos(cosine)
         )
 
-        if angle > 45:
+        if angle > 60:
             direction_changes += 1
 
-    score = min(
-        100,
-        direction_changes * 2
+    for speed in speeds:
+
+        if speed > avg_speed * 1.5:
+            burst_movements += 1
+
+    score = (
+        direction_changes * 0.4 +
+        burst_movements * 0.6
     )
+
+    score = min(score, 95)
 
     return {
         "score": round(score, 2),
         "metrics": {
-            "direction_changes":
-            direction_changes
+            "direction_changes": direction_changes,
+            "burst_movements": burst_movements,
+            "average_speed": round(
+                float(avg_speed),
+                2
+            )
         },
         "remarks":
-        "Estimated from movement direction changes"
+        "Estimated from direction changes and movement bursts"
     }

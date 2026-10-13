@@ -2,12 +2,9 @@ import numpy as np
 
 
 def calculate_recovery_quality(tracks):
-    """
-    Estimate recovery quality using
-    player trajectory.
-    """
 
-    if not tracks:
+    if not tracks or len(tracks) < 5:
+
         return {
             "score": 0.0,
             "metrics": {},
@@ -27,42 +24,66 @@ def calculate_recovery_quality(tracks):
             (center_x, center_y)
         )
 
-    if len(centers) < 5:
-        return {
-            "score": 0.0,
-            "metrics": {},
-            "remarks": "Insufficient trajectory"
-        }
-
     centers = np.array(centers)
 
-    base_x = np.mean(centers[:, 0])
-    base_y = np.mean(centers[:, 1])
+    base_x = np.mean(
+        centers[:, 0]
+    )
+
+    base_y = np.mean(
+        centers[:, 1]
+    )
 
     distances = []
 
     for x, y in centers:
 
-        d = np.sqrt(
+        distance = np.sqrt(
             (x - base_x) ** 2 +
             (y - base_y) ** 2
         )
 
-        distances.append(d)
+        distances.append(distance)
 
-    avg_distance = np.mean(distances)
+    avg_distance = np.mean(
+        distances
+    )
 
-    score = max(
+    consistency = np.std(
+        distances
+    )
+
+    recovery_score = (
+        100
+        - (avg_distance / 6)
+        - (consistency / 8)
+    )
+
+    recovery_score = max(
         0,
-        100 - (avg_distance / 5)
+        min(
+            100,
+            recovery_score
+        )
     )
 
     return {
-        "score": round(score, 2),
+        "score": round(
+            float(recovery_score),
+            2
+        ),
         "metrics": {
             "average_return_distance":
-            round(float(avg_distance), 2)
+            round(
+                float(avg_distance),
+                2
+            ),
+            "consistency":
+            round(
+                float(consistency),
+                2
+            )
         },
         "remarks":
-        "Recovery efficiency after movement"
+        "Recovery efficiency and movement consistency"
     }

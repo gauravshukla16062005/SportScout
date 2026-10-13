@@ -13,8 +13,9 @@ def analyze_video(video_path: str):
     result = run_pipeline(video_path)
 
     return format_analysis_response(
-        result["metadata"],
-        result["features"],
-        result["evaluation"],
-        result["recommendation"]
-    )
+    result["metadata"],
+    result["features"],
+    result["evaluation"],
+    result["recommendation"],
+    result.get("player_profile")
+)

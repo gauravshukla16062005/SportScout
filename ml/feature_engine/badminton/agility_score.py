@@ -9,12 +9,9 @@ def calculate_agility_score(
     footwork,
     speed,
     balance,
-    recovery_quality
+    recovery_quality,
+    reaction_analysis
 ):
-    """
-    Combine movement-related
-    features into one agility score.
-    """
 
     footwork_score = footwork.get(
         "score",
@@ -36,11 +33,17 @@ def calculate_agility_score(
         0
     )
 
+    reaction_score = reaction_analysis.get(
+        "score",
+        0
+    )
+
     agility = (
-        footwork_score * 0.30
-        + speed_score * 0.25
-        + balance_score * 0.20
-        + recovery_score * 0.25
+        footwork_score * 0.25 +
+        speed_score * 0.25 +
+        balance_score * 0.20 +
+        recovery_score * 0.15 +
+        reaction_score * 0.15
     )
 
     if agility >= 85:
@@ -57,7 +60,7 @@ def calculate_agility_score(
 
     return {
         "score": round(
-            agility,
+            float(agility),
             2
         ),
         "rating": rating

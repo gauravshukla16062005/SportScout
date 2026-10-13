@@ -32,6 +32,10 @@ from ml.feature_engine.badminton.player_profile import (
     generate_player_profile
 )
 
+from ml.feature_engine.badminton.agility_score import (
+    calculate_agility_score
+)
+
 import json
 import os
 
@@ -76,8 +80,19 @@ def run_pipeline(video_path: str):
     # Step 4 : Feature Extraction
     # -----------------------------
     features = extract_features(
-        keypoints,
-        tracks,
+    keypoints,
+    tracks,
+    )
+
+    with open(
+    "results/features_debug.json",
+    "w"
+    ) as f:
+       json.dump(
+        features,
+        f,
+        indent=4,
+        default=str
     )
 
     # -----------------------------
@@ -97,7 +112,17 @@ def run_pipeline(video_path: str):
 
     player_profile = generate_player_profile(
     features
-)
+    )
+
+    agility_score = calculate_agility_score(
+    features["footwork"],
+    features["player_speed"],
+    features["balance"],
+    features["recovery_quality"],
+    features["reaction_analysis"]
+    )
+
+    features["agility_score"] = agility_score
 
     # -----------------------------
     # Step 7 : Build Report
